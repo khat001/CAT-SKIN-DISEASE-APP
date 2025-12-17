@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -58,7 +59,7 @@ class RecentPredictionsWidget extends StatelessWidget {
         color: AppTheme.lightTheme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppTheme.lightTheme.colorScheme.outline.withValues(alpha: 0.3),
+          color: AppTheme.lightTheme.colorScheme.outline.withOpacity( 0.3),
         ),
       ),
       child: Column(
@@ -66,7 +67,7 @@ class RecentPredictionsWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(4.w),
             decoration: BoxDecoration(
-              color: AppTheme.lightTheme.primaryColor.withValues(alpha: 0.1),
+              color: AppTheme.lightTheme.primaryColor.withOpacity( 0.1),
               borderRadius: BorderRadius.circular(50),
             ),
             child: CustomIconWidget(
@@ -98,7 +99,7 @@ class RecentPredictionsWidget extends StatelessWidget {
 
   Widget _buildPredictionsList() {
     return SizedBox(
-      height: 20.h,
+      height: 24.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: predictions.length,
@@ -124,7 +125,7 @@ class RecentPredictionsWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity( 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -136,7 +137,7 @@ class RecentPredictionsWidget extends StatelessWidget {
           onTap: () => onPredictionTap(prediction),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: EdgeInsets.all(3.w),
+            padding: EdgeInsets.all(2.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -147,72 +148,71 @@ class RecentPredictionsWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: AppTheme.lightTheme.colorScheme.outline
-                          .withValues(alpha: 0.1),
+                          .withOpacity( 0.1),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: imageUrl.isNotEmpty
-                          ? CustomImageWidget(
-                              imageUrl: imageUrl,
+                          ? Image.file(
+                              File(imageUrl),
                               width: double.infinity,
                               height: double.infinity,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Center(
+                                child: CustomIconWidget(
+                                  iconName: 'pets',
+                                  color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+                                  size: 8.w,
+                                ),
+                              ),
                             )
                           : Center(
                               child: CustomIconWidget(
                                 iconName: 'pets',
-                                color: AppTheme
-                                    .lightTheme.colorScheme.onSurfaceVariant,
+                                color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
                                 size: 8.w,
                               ),
                             ),
                     ),
                   ),
                 ),
-                SizedBox(height: 2.w),
-                Expanded(
-                  flex: 2,
+                SizedBox(height: 0.5.w),
+                Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         condition,
-                        style:
-                            AppTheme.lightTheme.textTheme.titleSmall?.copyWith(
+                        style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
+                          fontSize: 11,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 1.w),
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 2.w, vertical: 0.5.w),
-                            decoration: BoxDecoration(
-                              color: _getConfidenceColor(confidence)
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '${(confidence * 100).toStringAsFixed(1)}%',
-                              style: AppTheme.lightTheme.textTheme.bodySmall
-                                  ?.copyWith(
-                                color: _getConfidenceColor(confidence),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                      SizedBox(height: 0.3.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 0.2.w),
+                        decoration: BoxDecoration(
+                          color: _getConfidenceColor(confidence).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${(confidence * 100).toStringAsFixed(1)}%',
+                          style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                            color: _getConfidenceColor(confidence),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 9,
                           ),
-                        ],
+                        ),
                       ),
-                      SizedBox(height: 1.w),
+                      SizedBox(height: 0.3.w),
                       Text(
                         _formatTimestamp(timestamp),
-                        style:
-                            AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                          color:
-                              AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+                        style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+                          fontSize: 9,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

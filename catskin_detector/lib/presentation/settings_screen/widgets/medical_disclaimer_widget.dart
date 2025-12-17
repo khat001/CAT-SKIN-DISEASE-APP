@@ -12,10 +12,10 @@ class MedicalDisclaimerWidget extends StatelessWidget {
       padding: EdgeInsets.all(4.w),
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       decoration: BoxDecoration(
-        color: AppTheme.warningLight.withValues(alpha: 0.1),
+        color: AppTheme.warningLight.withOpacity( 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppTheme.warningLight.withValues(alpha: 0.3),
+          color: AppTheme.warningLight.withOpacity( 0.3),
           width: 1,
         ),
       ),

@@ -160,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: 4,
+        currentIndex: 3,
         onTap: (index) => _onBottomNavTap(context, index),
         items: [
           BottomNavigationBarItem(
@@ -188,19 +188,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               size: 6.w,
             ),
             label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: CustomIconWidget(
-              iconName: 'analytics',
-              color: AppTheme.getTextColor(context, isSecondary: true),
-              size: 6.w,
-            ),
-            activeIcon: CustomIconWidget(
-              iconName: 'analytics',
-              color: Theme.of(context).colorScheme.primary,
-              size: 6.w,
-            ),
-            label: 'Results',
           ),
           BottomNavigationBarItem(
             icon: CustomIconWidget(
@@ -242,12 +229,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Navigator.pushReplacementNamed(context, '/camera-screen');
         break;
       case 2:
-        Navigator.pushReplacementNamed(context, '/prediction-results-screen');
-        break;
-      case 3:
         Navigator.pushReplacementNamed(context, '/records-screen');
         break;
-      case 4:
+      case 3:
         // Already on settings screen
         break;
     }

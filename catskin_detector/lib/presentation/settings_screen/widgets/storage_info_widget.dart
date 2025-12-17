@@ -25,10 +25,10 @@ class StorageInfoWidget extends StatelessWidget {
         color: Theme.of(context)
             .colorScheme
             .primaryContainer
-            .withValues(alpha: 0.3),
+            .withOpacity( 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+          color: Theme.of(context).colorScheme.primary.withOpacity( 0.2),
           width: 1,
         ),
       ),
@@ -58,7 +58,7 @@ class StorageInfoWidget extends StatelessWidget {
             child: LinearProgressIndicator(
               value: usagePercentage / 100,
               backgroundColor:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  Theme.of(context).colorScheme.outline.withOpacity( 0.2),
               valueColor: AlwaysStoppedAnimation<Color>(
                 usagePercentage > 80
                     ? AppTheme.errorLight

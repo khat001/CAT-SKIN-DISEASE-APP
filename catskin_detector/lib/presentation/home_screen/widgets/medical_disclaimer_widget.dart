@@ -13,9 +13,9 @@ class MedicalDisclaimerWidget extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: AppTheme.warningLight.withValues(alpha: 0.1),
+        color: AppTheme.warningLight.withOpacity( 0.1),
         border: Border.all(
-          color: AppTheme.warningLight.withValues(alpha: 0.3),
+          color: AppTheme.warningLight.withOpacity( 0.3),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(12),
@@ -26,7 +26,7 @@ class MedicalDisclaimerWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(1.5.w),
             decoration: BoxDecoration(
-              color: AppTheme.warningLight.withValues(alpha: 0.2),
+              color: AppTheme.warningLight.withOpacity( 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: CustomIconWidget(

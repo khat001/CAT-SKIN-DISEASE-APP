@@ -202,7 +202,7 @@ class _FilterBottomSheetWidgetState extends State<FilterBottomSheetWidget> {
           _filters['conditionType'] = selected ? value : null;
         });
       },
-      selectedColor: AppTheme.lightTheme.primaryColor.withValues(alpha: 0.2),
+      selectedColor: AppTheme.lightTheme.primaryColor.withOpacity( 0.2),
       checkmarkColor: AppTheme.lightTheme.primaryColor,
     );
   }
@@ -218,7 +218,7 @@ class _FilterBottomSheetWidgetState extends State<FilterBottomSheetWidget> {
           _filters['confidenceLevel'] = selected ? value : null;
         });
       },
-      selectedColor: AppTheme.lightTheme.primaryColor.withValues(alpha: 0.2),
+      selectedColor: AppTheme.lightTheme.primaryColor.withOpacity( 0.2),
       checkmarkColor: AppTheme.lightTheme.primaryColor,
     );
   }

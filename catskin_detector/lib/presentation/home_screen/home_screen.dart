@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/storage_service.dart';
 import './widgets/camera_capture_button_widget.dart';
 import './widgets/medical_disclaimer_widget.dart';
 import './widgets/quick_access_shortcuts_widget.dart';
@@ -22,8 +24,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final ImagePicker _imagePicker = ImagePicker();
 
-  // DATA FOR RECENT PREDICTIONS! DITO DATI YUNG MOCK RECULTS OR PLACEHOLDER
-  final List<Map<String, dynamic>> _recentPredictions = [];
+  // Recent predictions loaded from storage
+  List<Map<String, dynamic>> _recentPredictions = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentPredictions();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh predictions when returning to home screen
+    _loadRecentPredictions();
+  }
+
+  Future<void> _loadRecentPredictions() async {
+    try {
+      final predictions = await StorageService.getSavedPredictions();
+      setState(() {
+        _recentPredictions = predictions.take(5).map((prediction) => {
+          'condition': prediction['predicted_class'],
+          'confidence': prediction['confidence'],
+          'timestamp': DateTime.parse(prediction['timestamp']),
+          'imageUrl': prediction['image_path'],
+          'id': prediction['id'],
+          'all_predictions': prediction['all_predictions'],
+        }).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _recentPredictions = [];
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,11 +101,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: 3.h),
 
                 // Recent Predictions
-                RecentPredictionsWidget(
-                  predictions: _recentPredictions.take(5).toList(),
-                  onViewAllPressed: _navigateToRecords,
-                  onPredictionTap: _navigateToPredictionDetails,
-                ),
+                _isLoading
+                    ? Container(
+                        height: 20.h,
+                        margin: EdgeInsets.symmetric(horizontal: 4.w),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppTheme.lightTheme.primaryColor,
+                          ),
+                        ),
+                      )
+                    : RecentPredictionsWidget(
+                        predictions: _recentPredictions,
+                        onViewAllPressed: _navigateToRecords,
+                        onPredictionTap: _navigateToPredictionDetails,
+                      ),
 
                 SizedBox(height: 3.h),
 
@@ -134,24 +182,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _handleRefresh() async {
-    // Simulate refresh delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // In a real app, this would fetch latest predictions from database
-    setState(() {
-      // Update timestamps to show refresh worked
-      for (var prediction in _recentPredictions) {
-        if (prediction['id'] == 1) {
-          prediction['timestamp'] = DateTime.now().subtract(
-            const Duration(minutes: 30),
-          );
-        }
-      }
-    });
+    await _loadRecentPredictions();
   }
 
   void _navigateToCamera() {
-    Navigator.pushNamed(context, '/camera-screen');
+    Navigator.pushNamed(context, '/camera-screen').then((_) => _loadRecentPredictions());
   }
 
   Future<void> _pickFromGallery() async {
@@ -171,57 +206,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _processGalleryImage(String imagePath) async {
-    // Generate mock prediction results for gallery image
-    final Map<String, dynamic> mockResult = {
-      "id": DateTime.now().millisecondsSinceEpoch,
-      "imagePath": imagePath,
-      "predictions": [
-        {
-          "disease": "Feline Acne",
-          "accuracy": 87.5,
-          "description":
-              "Feline acne is a common skin condition affecting the chin and lip area of cats.",
-          "causes": [
-            "Stress and poor grooming habits",
-            "Plastic food bowls",
-            "Hormonal changes",
-            "Poor hygiene",
-          ],
-          "remedies": [
-            "Clean affected area with warm water",
-            "Use stainless steel or ceramic bowls",
-            "Apply topical treatments as prescribed",
-            "Maintain good hygiene",
-          ],
-        },
-        {
-          "disease": "Ringworm",
-          "accuracy": 12.3,
-          "description":
-              "A fungal infection that affects the skin, hair, and nails.",
-          "causes": [
-            "Contact with infected animals",
-            "Contaminated environment",
-            "Weakened immune system",
-          ],
-          "remedies": [
-            "Antifungal medications",
-            "Topical treatments",
-            "Environmental decontamination",
-          ],
-        },
-      ],
-      "timestamp": DateTime.now(),
-      "disclaimer":
-          "This analysis is for early detection purposes only and should not replace professional veterinary diagnosis. Please consult a veterinarian for proper medical advice.",
-    };
-
-    // Navigate to prediction results
+    // Navigate to prediction results with image file
     Navigator.pushNamed(
       context,
       '/prediction-results-screen',
-      arguments: mockResult,
-    );
+      arguments: {
+        'imageFile': File(imagePath),
+      },
+    ).then((_) => _loadRecentPredictions());
   }
 
   void _showErrorDialog(String message) {
@@ -242,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToRecords() {
-    Navigator.pushNamed(context, '/records-screen');
+    Navigator.pushNamed(context, '/records-screen').then((_) => _loadRecentPredictions());
   }
 
   void _navigateToSettings() {
@@ -253,8 +245,16 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushNamed(
       context,
       '/prediction-results-screen',
-      arguments: prediction,
-    );
+      arguments: {
+        'imageFile': File(prediction['imageUrl']),
+        'predictionData': {
+          'success': true,
+          'predicted_class': prediction['condition'],
+          'confidence': prediction['confidence'],
+          'all_predictions': prediction['all_predictions'] ?? [],
+        },
+      },
+    ).then((_) => _loadRecentPredictions()); // Refresh when returning
   }
 
   void _onBottomNavTap(int index) {

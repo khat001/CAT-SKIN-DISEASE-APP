@@ -39,7 +39,7 @@ class SettingsSectionWidget extends StatelessWidget {
                 color: Theme.of(context)
                     .colorScheme
                     .outline
-                    .withValues(alpha: 0.2),
+                    .withOpacity( 0.2),
                 width: 1,
               ),
             ),
@@ -57,7 +57,7 @@ class SettingsSectionWidget extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .outline
-                            .withValues(alpha: 0.1),
+                            .withOpacity( 0.1),
                         indent: 4.w,
                         endIndent: 4.w,
                       ),

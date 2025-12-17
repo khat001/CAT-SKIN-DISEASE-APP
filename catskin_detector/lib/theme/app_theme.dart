@@ -47,15 +47,15 @@ class AppTheme {
       brightness: Brightness.light,
       primary: primaryLight,
       onPrimary: Colors.white,
-      primaryContainer: primaryLight.withValues(alpha: 0.1),
+      primaryContainer: primaryLight.withOpacity( 0.1),
       onPrimaryContainer: primaryLight,
       secondary: successLight,
       onSecondary: Colors.white,
-      secondaryContainer: successLight.withValues(alpha: 0.1),
+      secondaryContainer: successLight.withOpacity( 0.1),
       onSecondaryContainer: successLight,
       tertiary: accentLight,
       onTertiary: Colors.white,
-      tertiaryContainer: accentLight.withValues(alpha: 0.1),
+      tertiaryContainer: accentLight.withOpacity( 0.1),
       onTertiaryContainer: accentLight,
       error: errorLight,
       onError: Colors.white,
@@ -63,9 +63,9 @@ class AppTheme {
       onSurface: textPrimaryLight,
       onSurfaceVariant: textSecondaryLight,
       outline: borderSubtleLight,
-      outlineVariant: borderSubtleLight.withValues(alpha: 0.5),
+      outlineVariant: borderSubtleLight.withOpacity( 0.5),
       shadow: shadowLight,
-      scrim: Colors.black.withValues(alpha: 0.5),
+      scrim: Colors.black.withOpacity( 0.5),
       inverseSurface: textPrimaryLight,
       onInverseSurface: surfaceElevatedLight,
       inversePrimary: primaryDark,
@@ -217,7 +217,7 @@ class AppTheme {
         fontWeight: FontWeight.w400,
       ),
       hintStyle: GoogleFonts.inter(
-        color: textSecondaryLight.withValues(alpha: 0.7),
+        color: textSecondaryLight.withOpacity( 0.7),
         fontSize: 16,
         fontWeight: FontWeight.w400,
       ),
@@ -238,7 +238,7 @@ class AppTheme {
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return primaryLight.withValues(alpha: 0.3);
+          return primaryLight.withOpacity( 0.3);
         }
         return borderSubtleLight;
       }),
@@ -274,7 +274,7 @@ class AppTheme {
     sliderTheme: SliderThemeData(
       activeTrackColor: primaryLight,
       thumbColor: primaryLight,
-      overlayColor: primaryLight.withValues(alpha: 0.2),
+      overlayColor: primaryLight.withOpacity( 0.2),
       inactiveTrackColor: borderSubtleLight,
       valueIndicatorColor: primaryLight,
       valueIndicatorTextStyle: GoogleFonts.jetBrainsMono(
@@ -301,7 +301,7 @@ class AppTheme {
 
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
-        color: textPrimaryLight.withValues(alpha: 0.9),
+        color: textPrimaryLight.withOpacity( 0.9),
         borderRadius: BorderRadius.circular(8),
       ),
       textStyle: GoogleFonts.inter(
@@ -335,15 +335,15 @@ class AppTheme {
       brightness: Brightness.dark,
       primary: primaryDark,
       onPrimary: Colors.black,
-      primaryContainer: primaryDark.withValues(alpha: 0.2),
+      primaryContainer: primaryDark.withOpacity( 0.2),
       onPrimaryContainer: primaryDark,
       secondary: successDark,
       onSecondary: Colors.white,
-      secondaryContainer: successDark.withValues(alpha: 0.2),
+      secondaryContainer: successDark.withOpacity( 0.2),
       onSecondaryContainer: successDark,
       tertiary: accentDark,
       onTertiary: Colors.white,
-      tertiaryContainer: accentDark.withValues(alpha: 0.2),
+      tertiaryContainer: accentDark.withOpacity( 0.2),
       onTertiaryContainer: accentDark,
       error: errorDark,
       onError: Colors.white,
@@ -351,9 +351,9 @@ class AppTheme {
       onSurface: textPrimaryDark,
       onSurfaceVariant: textSecondaryDark,
       outline: borderSubtleDark,
-      outlineVariant: borderSubtleDark.withValues(alpha: 0.5),
+      outlineVariant: borderSubtleDark.withOpacity( 0.5),
       shadow: shadowDark,
-      scrim: Colors.black.withValues(alpha: 0.7),
+      scrim: Colors.black.withOpacity( 0.7),
       inverseSurface: textPrimaryDark,
       onInverseSurface: surfaceElevatedDark,
       inversePrimary: primaryLight,
@@ -489,7 +489,7 @@ class AppTheme {
         fontWeight: FontWeight.w400,
       ),
       hintStyle: GoogleFonts.inter(
-        color: textSecondaryDark.withValues(alpha: 0.7),
+        color: textSecondaryDark.withOpacity( 0.7),
         fontSize: 16,
         fontWeight: FontWeight.w400,
       ),
@@ -508,7 +508,7 @@ class AppTheme {
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return primaryDark.withValues(alpha: 0.3);
+          return primaryDark.withOpacity( 0.3);
         }
         return borderSubtleDark;
       }),
@@ -540,7 +540,7 @@ class AppTheme {
     sliderTheme: SliderThemeData(
       activeTrackColor: primaryDark,
       thumbColor: primaryDark,
-      overlayColor: primaryDark.withValues(alpha: 0.2),
+      overlayColor: primaryDark.withOpacity( 0.2),
       inactiveTrackColor: borderSubtleDark,
       valueIndicatorColor: primaryDark,
       valueIndicatorTextStyle: GoogleFonts.jetBrainsMono(
@@ -565,7 +565,7 @@ class AppTheme {
     ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
-        color: textPrimaryDark.withValues(alpha: 0.9),
+        color: textPrimaryDark.withOpacity( 0.9),
         borderRadius: BorderRadius.circular(8),
       ),
       textStyle: GoogleFonts.inter(

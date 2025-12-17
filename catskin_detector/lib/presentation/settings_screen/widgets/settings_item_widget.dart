@@ -35,7 +35,7 @@ class SettingsItemWidget extends StatelessWidget {
               height: 10.w,
               decoration: BoxDecoration(
                 color: (iconColor ?? Theme.of(context).colorScheme.primary)
-                    .withValues(alpha: 0.1),
+                    .withOpacity( 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(

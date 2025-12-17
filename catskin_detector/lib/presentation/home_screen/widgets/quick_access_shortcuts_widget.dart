@@ -65,7 +65,7 @@ class QuickAccessShortcutsWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity( 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -85,7 +85,7 @@ class QuickAccessShortcutsWidget extends StatelessWidget {
                   padding: EdgeInsets.all(3.w),
                   decoration: BoxDecoration(
                     color:
-                        AppTheme.lightTheme.primaryColor.withValues(alpha: 0.1),
+                        AppTheme.lightTheme.primaryColor.withOpacity( 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: CustomIconWidget(

@@ -1,12 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/api_service.dart';
+import '../../services/storage_service.dart';
 import './widgets/action_buttons_widget.dart';
 import './widgets/expandable_info_section_widget.dart';
 import './widgets/image_preview_widget.dart';
 import './widgets/medical_disclaimer_widget.dart';
+import './widgets/prediction_card_widget.dart';
 
 
 class PredictionResultsScreen extends StatefulWidget {
@@ -18,31 +22,134 @@ class PredictionResultsScreen extends StatefulWidget {
 }
 
 class _PredictionResultsScreenState extends State<PredictionResultsScreen> {
-  // DITO YUNG PREDICTION DATA NA DAPAT MULA SA MODEL/ REMOVED PLACEHOLDERS/MOCK DATA
-  final Map<String, dynamic> predictionData = {};
+  final ApiService _apiService = ApiService();
+  Map<String, dynamic>? predictionData;
+  bool isLoading = true;
+  String? error;
+  File? imageFile;
+  bool isSavedRecord = false;
 
   void _takeAnotherPhoto() {
-    Navigator.pushReplacementNamed(context, '/camera-screen');
+    Navigator.pop(context);
   }
 
-  void _saveToRecords() {
-    // Simulate saving to records
-    Fluttertoast.showToast(
-      msg: "Results saved to records successfully",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: AppTheme.lightTheme.colorScheme.secondary,
-      textColor: Colors.white,
-    );
+  void _saveToRecords() async {
+    if (predictionData == null || imageFile == null) return;
+    
+    try {
+      await StorageService.savePrediction(
+        predictedClass: predictionData!['predicted_class'],
+        confidence: predictionData!['confidence'],
+        imagePath: imageFile!.path,
+        allPredictions: predictionData!['all_predictions'],
+      );
+      
+      Fluttertoast.showToast(
+        msg: "Results saved to records successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppTheme.lightTheme.colorScheme.secondary,
+        textColor: Colors.white,
+      );
+      
+      // Wait 1 second then navigate to homepage
+      await Future.delayed(Duration(seconds: 1));
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home-screen',
+        (route) => false,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Failed to save results",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 
   String _formatPredictionForSharing() {
+    if (predictionData == null) return '';
     return '''
-Condition: ${predictionData["condition"]}
-Confidence: ${(predictionData["confidence"] as double).toStringAsFixed(1)}%
-Severity: ${predictionData["severity"]}
-Analyzed: ${predictionData["timestamp"].toString().split('.')[0]}
+Condition: ${predictionData!["predicted_class"]}
+Confidence: ${(predictionData!["confidence"] * 100).toStringAsFixed(1)}%
+Analyzed: ${DateTime.now().toString().split('.')[0]}
     ''';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isLoading && imageFile == null) {
+      _loadPredictionData();
+    }
+  }
+
+  void _loadPredictionData() async {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    print('Prediction args: $args');
+    
+    if (args != null && args['imageFile'] != null) {
+      imageFile = args['imageFile'] as File;
+      print('Image file path: ${imageFile!.path}');
+      
+      // Check if this is a saved record with existing prediction data
+      if (args['predictionData'] != null) {
+        setState(() {
+          predictionData = args['predictionData'] as Map<String, dynamic>;
+          isLoading = false;
+          isSavedRecord = true;
+        });
+        print('Loaded saved prediction: ${predictionData!['predicted_class']}');
+      } else {
+        // Make new prediction and auto-save
+        await _makePrediction();
+      }
+    } else {
+      setState(() {
+        error = 'No image provided';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _makePrediction() async {
+    print('=== _makePrediction called ===');
+    print('Image file: ${imageFile?.path}');
+    print('Image file exists: ${imageFile?.existsSync()}');
+    
+    try {
+      print('Calling _apiService.predictImage...');
+      final result = await _apiService.predictImage(imageFile!);
+      print('API returned: $result');
+      
+      if (result['success'] == true) {
+        setState(() {
+          predictionData = result;
+          isLoading = false;
+        });
+        print('Prediction successful: ${result['predicted_class']}');
+      } else {
+        setState(() {
+          error = result['error'] ?? 'Prediction failed';
+          isLoading = false;
+        });
+        print('Prediction failed: ${result['error']}');
+      }
+    } catch (e) {
+      print('Exception in _makePrediction: $e');
+      setState(() {
+        error = 'Server connection failed: $e';
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -70,59 +177,78 @@ Analyzed: ${predictionData["timestamp"].toString().split('.')[0]}
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image preview with timestamp
-                  ImagePreviewWidget(
-                    imageUrl: predictionData["imageUrl"] as String,
-                    timestamp: predictionData["timestamp"] as DateTime,
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : error != null
+              ? SingleChildScrollView(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error, size: 64, color: Colors.red),
+                          SizedBox(height: 16),
+                          Text(error!, textAlign: TextAlign.center),
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Go Back'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Image preview
+                            if (imageFile != null)
+                              Container(
+                                width: double.infinity,
+                                height: 250,
+                                margin: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  image: DecorationImage(
+                                    image: FileImage(imageFile!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
 
-                  //A. PASTE
-         
-                  // Expandable information sections
-                  ExpandableInfoSectionWidget(
-                    title: 'About This Condition',
-                    content: predictionData["about"] as String,
-                    iconName: 'info',
-                  ),
+                            // Prediction results
+                            if (predictionData != null)
+                              PredictionCardWidget(
+                                predictedClass: predictionData!['predicted_class'],
+                                confidence: predictionData!['confidence'],
+                                allPredictions: predictionData!['all_predictions'],
+                              ),
 
-                  ExpandableInfoSectionWidget(
-                    title: 'Recommended Actions',
-                    content: predictionData["recommendations"] as String,
-                    iconName: 'healing',
-                  ),
+                            // Medical disclaimer
+                            const MedicalDisclaimerWidget(),
 
-                  ExpandableInfoSectionWidget(
-                    title: 'When to See Vet',
-                    content: predictionData["vetConsultation"] as String,
-                    iconName: 'local_hospital',
-                  ),
+                            SizedBox(height: 10.h),
+                          ],
+                        ),
+                      ),
+                    ),
 
-                  // Medical disclaimer
-                  const MedicalDisclaimerWidget(),
-
-                  // Bottom padding for action buttons
-                  SizedBox(height: 10.h),
-                ],
-              ),
-            ),
-          ),
-
-          // Bottom action buttons
-          ActionButtonsWidget(
-            onTakeAnotherPhoto: _takeAnotherPhoto,
-            onSaveToRecords: _saveToRecords,
-            predictionData: _formatPredictionForSharing(),
-          ),
-        ],
-      ),
+                    // Bottom action buttons (only show for new predictions, not saved records)
+                    if (!isSavedRecord)
+                      ActionButtonsWidget(
+                        onTakeAnotherPhoto: _takeAnotherPhoto,
+                        onSaveToRecords: _saveToRecords,
+                        predictionData: _formatPredictionForSharing(),
+                      ),
+                  ],
+                ),
     );
   }
 }

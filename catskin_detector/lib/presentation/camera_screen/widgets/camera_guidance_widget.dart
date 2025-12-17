@@ -32,7 +32,7 @@ class CameraGuidanceWidget extends StatelessWidget {
               margin: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: AppTheme.primaryLight.withValues(alpha: 0.5),
+                  color: AppTheme.primaryLight.withOpacity( 0.5),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(150),
@@ -43,7 +43,7 @@ class CameraGuidanceWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.7),
+              color: Colors.black.withOpacity( 0.7),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(

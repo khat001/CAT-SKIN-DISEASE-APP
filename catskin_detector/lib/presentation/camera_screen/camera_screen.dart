@@ -1,4 +1,5 @@
 
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -233,10 +234,14 @@ class _CameraScreenState extends State<CameraScreen>
       );
 
       if (image != null) {
-        setState(() {
-          _capturedImagePath = image.path;
-        });
-        _showImagePreview();
+        // Navigate directly to prediction results with gallery image
+        Navigator.pushNamed(
+          context,
+          '/prediction-results-screen',
+          arguments: {
+            'imageFile': File(image.path),
+          },
+        );
       }
     } catch (e) {
       _showErrorDialog('Failed to pick image from gallery');
@@ -325,68 +330,19 @@ class _CameraScreenState extends State<CameraScreen>
     );
 
     try {
-      // Simulate AI processing time
-      await Future.delayed(Duration(seconds: 3));
-
-      // Generate mock prediction results
-      final List<Map<String, dynamic>> mockResults = [
-        {
-          "id": DateTime.now().millisecondsSinceEpoch,
-          "imagePath": _capturedImagePath,
-          "predictions": [
-            {
-              "disease": "Feline Acne",
-              "accuracy": 87.5,
-              "description":
-                  "Feline acne is a common skin condition affecting the chin and lip area of cats.",
-              "causes": [
-                "Stress and poor grooming habits",
-                "Plastic food bowls",
-                "Hormonal changes",
-                "Poor hygiene"
-              ],
-              "remedies": [
-                "Clean affected area with warm water",
-                "Use stainless steel or ceramic bowls",
-                "Apply topical treatments as prescribed",
-                "Maintain good hygiene"
-              ]
-            },
-            {
-              "disease": "Ringworm",
-              "accuracy": 12.3,
-              "description":
-                  "A fungal infection that affects the skin, hair, and nails.",
-              "causes": [
-                "Contact with infected animals",
-                "Contaminated environment",
-                "Weakened immune system"
-              ],
-              "remedies": [
-                "Antifungal medications",
-                "Topical treatments",
-                "Environmental decontamination"
-              ]
-            }
-          ],
-          "timestamp": DateTime.now(),
-          "disclaimer":
-              "This analysis is for early detection purposes only and should not replace professional veterinary diagnosis. Please consult a veterinarian for proper medical advice."
-        }
-      ];
-
       Navigator.pop(context); // Close processing modal
 
-      // Navigate to prediction results
+      // Navigate to prediction results with image file
       Navigator.pushNamed(
         context,
         '/prediction-results-screen',
-        arguments: mockResults.first,
+        arguments: {
+          'imageFile': File(_capturedImagePath!),
+        },
       );
     } catch (e) {
       Navigator.pop(context);
       _showErrorDialog('Failed to process image. Please try again.');
-    } finally {
       setState(() {
         _isProcessing = false;
         _capturedImagePath = null;

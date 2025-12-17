@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/storage_service.dart';
 import './widgets/empty_state_widget.dart';
 import './widgets/filter_bottom_sheet_widget.dart';
 import './widgets/record_card_widget.dart';
@@ -27,7 +29,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMockData();
+    _loadSavedRecords();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -38,10 +40,29 @@ class _RecordsScreenState extends State<RecordsScreen> {
     super.dispose();
   }
 
-  void _loadMockData() {
-    _allRecords = []; //DITO YUNG RECORDS DATA YUNG LEGIT
+  void _loadSavedRecords() async {
+    final savedPredictions = await StorageService.getSavedPredictions();
+    
+    _allRecords = savedPredictions.map((prediction) {
+      return {
+        'id': int.parse(prediction['id']),
+        'condition': prediction['predicted_class'],
+        'confidence': (prediction['confidence'] * 100).toDouble(),
+        'date': DateTime.parse(prediction['timestamp']),
+        'imagePath': prediction['image_path'],
+        'severity': _getSeverityFromConfidence(prediction['confidence']),
+        'location': 'Unknown',
+        'all_predictions': prediction['all_predictions'],
+      };
+    }).toList();
 
     _applyFiltersAndSort();
+  }
+  
+  String _getSeverityFromConfidence(double confidence) {
+    if (confidence >= 0.8) return 'High';
+    if (confidence >= 0.6) return 'Medium';
+    return 'Low';
   }
 
   void _onSearchChanged() {
@@ -167,37 +188,34 @@ class _RecordsScreenState extends State<RecordsScreen> {
     _applyFiltersAndSort();
   }
 
-  void _deleteRecord(int recordId) {
-    setState(() {
-      _allRecords.removeWhere((record) => record['id'] == recordId);
-    });
-    _applyFiltersAndSort();
+  void _deleteRecord(int recordId) async {
+    try {
+      await StorageService.deletePrediction(recordId.toString());
+      
+      setState(() {
+        _allRecords.removeWhere((record) => record['id'] == recordId);
+      });
+      _applyFiltersAndSort();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Record deleted successfully'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            // In a real app, implement undo functionality
-          },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Record deleted successfully'),
+          backgroundColor: Colors.green,
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete record'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _refreshRecords() async {
-    setState(() {
-    });
-
-    // Simulate network delay
     await Future.delayed(Duration(seconds: 1));
-
-    // In a real app, fetch updated data from server
-    //_loadMockData();
-
-    setState(() {
-    });
+    _loadSavedRecords();
   }
 
   void _showFilterBottomSheet() {
@@ -213,10 +231,21 @@ class _RecordsScreenState extends State<RecordsScreen> {
   }
 
   void _navigateToRecordDetails(Map<String, dynamic> record) {
+    // Convert record format to match what prediction results screen expects
+    final predictionData = {
+      'success': true,
+      'predicted_class': record['condition'],
+      'confidence': record['confidence'] / 100, // Convert back to 0-1 range
+      'all_predictions': record['all_predictions'],
+    };
+    
     Navigator.pushNamed(
       context,
       '/prediction-results-screen',
-      arguments: record,
+      arguments: {
+        'imageFile': File(record['imagePath']),
+        'predictionData': predictionData,
+      },
     );
   }
 

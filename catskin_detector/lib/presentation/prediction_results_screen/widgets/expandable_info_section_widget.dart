@@ -65,7 +65,7 @@ class _ExpandableInfoSectionWidgetState
         color: AppTheme.lightTheme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppTheme.lightTheme.colorScheme.outline.withValues(alpha: 0.2),
+          color: AppTheme.lightTheme.colorScheme.outline.withOpacity( 0.2),
         ),
       ),
       child: Column(
@@ -115,7 +115,7 @@ class _ExpandableInfoSectionWidgetState
                 children: [
                   Divider(
                     color: AppTheme.lightTheme.colorScheme.outline
-                        .withValues(alpha: 0.2),
+                        .withOpacity( 0.2),
                     height: 1,
                   ),
                   SizedBox(height: 2.h),

@@ -31,7 +31,7 @@ class CameraControlsWidget extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               Colors.transparent,
-              Colors.black.withValues(alpha: 0.8),
+              Colors.black.withOpacity(0.8),
             ],
           ),
         ),
@@ -46,10 +46,10 @@ class CameraControlsWidget extends StatelessWidget {
                 width: 15.w,
                 height: 8.h,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: Colors.white.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -78,7 +78,7 @@ class CameraControlsWidget extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
+                      color: Colors.black.withOpacity(0.3),
                       blurRadius: 8,
                       offset: Offset(0, 4),
                     ),
@@ -111,10 +111,10 @@ class CameraControlsWidget extends StatelessWidget {
                       width: 15.w,
                       height: 8.h,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
+                          color: Colors.white.withOpacity(0.3),
                           width: 1,
                         ),
                       ),

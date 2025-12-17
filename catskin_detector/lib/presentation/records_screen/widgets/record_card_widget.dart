@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -61,12 +62,23 @@ class RecordCardWidget extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: CustomImageWidget(
-                      imageUrl: record['imageUrl'] ?? '',
-                      width: 15.w,
-                      height: 15.w,
-                      fit: BoxFit.cover,
-                    ),
+                    child: record['imagePath'] != null && File(record['imagePath']).existsSync()
+                        ? Image.file(
+                            File(record['imagePath']),
+                            width: 15.w,
+                            height: 15.w,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            width: 15.w,
+                            height: 15.w,
+                            color: Colors.grey.shade300,
+                            child: Icon(
+                              Icons.image,
+                              color: Colors.grey.shade600,
+                              size: 6.w,
+                            ),
+                          ),
                   ),
                 ),
                 SizedBox(width: 3.w),
@@ -95,7 +107,7 @@ class RecordCardWidget extends StatelessWidget {
                             horizontal: 2.w, vertical: 0.5.h),
                         decoration: BoxDecoration(
                           color: _getConfidenceColor(record['confidence'] ?? 0)
-                              .withValues(alpha: 0.1),
+                              .withOpacity( 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(

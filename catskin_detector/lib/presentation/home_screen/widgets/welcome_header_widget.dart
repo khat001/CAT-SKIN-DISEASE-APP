@@ -17,7 +17,7 @@ class WelcomeHeaderWidget extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             AppTheme.lightTheme.primaryColor,
-            AppTheme.lightTheme.primaryColor.withValues(alpha: 0.8),
+            AppTheme.lightTheme.primaryColor.withOpacity( 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -30,7 +30,7 @@ class WelcomeHeaderWidget extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(2.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity( 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Image.asset(
@@ -56,7 +56,7 @@ class WelcomeHeaderWidget extends StatelessWidget {
                     Text(
                       'Your Furr-iendly Cat Skin App',
                       style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity( 0.9),
                       ),
                     ),
                   ],
@@ -68,7 +68,7 @@ class WelcomeHeaderWidget extends StatelessWidget {
           Text(
             'Early detection of common feline skin conditions through advanced image analysis. Get instant insights and track your cat\'s health journey.',
             style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.95),
+              color: Colors.white.withOpacity( 0.95),
               height: 1.4,
             ),
           ),
